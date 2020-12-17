@@ -26,10 +26,16 @@ VAR Table1 =
         && 'Similarity Matrix'[n_users] >= Threshold
         && RELATED('Genres (to LookUp)'[Genres]) IN VALUES('Genre Mapping'[Genre Combinations])
         )
-RETURN
+VAR ANS =
     CONCATENATEX(
         TOPN(10, Table1, [cos_similarity], DESC),
         RELATED(Movies[Name]),
         UNICHAR(10)
     )
+RETURN
+    IF(
+        ISBLANK(ANS),
+        "Sorry, looks like there isn't a movie that's been watched with '" & LOOKUPVALUE(Movies[Name], Movies[Movie ID], Selected_Movie) & "' by enough users. Try lowering the user threshold or broadening the scope of genres.",
+        ANS
+        )
 ```
